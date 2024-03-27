@@ -1,59 +1,53 @@
 
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
 
 //Componentes
 function App() {
-  const [nome, setNome] = useState('');//CRIANDO USESTATE PARA CADA INPUT
-  const [email, setEmail] = useState('');
-  const [idade, setIdade] = useState('');
+  const [input, setInput] = useState('');//USESTATE ATRELADO AO INPUT
+  const [tarefas, setTarefas] = useState([]);//VAI SER UMA ARRAY
+ 
+useEffect(() => {
+  const tarefasStorage = localStorage.getItem('@tarefa');
 
-  const [user, setUser] = useState( {} );//CRIANDO UM OBJETO VAZIO USESTATE
-  //Vai ficar responsável por capiturar os valores dos userStates.
+  if(tarefasStorage) {
+    setTarefas(JSON.parse(tarefasStorage));
+  }
+}, []);
 
-  function registar(event) {
-    event.preventDefault();//Vai evitar a atualização do programa
-    setUser({
-      nome: nome,
-      idade: idade,
-      email: email
-    })
+useEffect(() => {
+  localStorage.setItem('@tarefa', JSON.stringify(tarefas));
+}, [tarefas]);
+
+
+
+  function registrar(event) {
+    event.preventDefault();
+
+    setTarefas([...tarefas, input])
+    setInput('');
   }
 
   return(
     <div>
-      <form onSubmit={registar}>
-        <label>Nome: </label><br/>
+      <h1>Cadastrando usuário</h1>
+
+      <form onSubmit={registrar}>
+        <label>Nome da tarefa: </label><br/>
         <input
-         placeholder='Digite seu nome'
-         value={nome}
-         onChange={ (event) => setNome(event.target.value)}
-         ></input><br/>
-
-        <label>E-mail: </label><br/>
-        <input 
-        placeholder='Digite seu email'
-        value={email}
-        onChange={ (event) => setEmail(event.target.value)}
-        ></input><br/>
-
-        <label>Idade: </label><br/>
-        <input 
-        placeholder='Digite sua idade'
-        value={idade}
-        onChange={ (event) => setIdade(event.target.value)}
-        ></input><br/>
-    
+         placeholder='Digite uma tarefa'
+         value={input}
+         onChange={ (event) => setInput(event.target.value)}
+         /><br/>
         <button type="submit">Registrar</button>
       </form>
+
       <br></br>
 
-      <div>
-        <span>Bem vindo: {user.nome} </span><br/>
-        <span>Idade: {user.idade} anos</span><br/>
-        <span>Email: {user.email} </span><br/>
-
-      </div>
+      <ul>
+        {tarefas.map( tarefa=> (
+          <li key={tarefa}>{tarefa}</li>
+        ))}
+      </ul>
     </div>
   );
 }
