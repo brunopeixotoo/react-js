@@ -1,53 +1,43 @@
 
 import { useState, useEffect } from 'react';
+import './style.css';
+
+//https://sujeitoprogramador.com/rn-api/?api=posts
 
 //Componentes
 function App() {
-  const [input, setInput] = useState('');//USESTATE ATRELADO AO INPUT
-  const [tarefas, setTarefas] = useState([]);//VAI SER UMA ARRAY
- 
-useEffect(() => {
-  const tarefasStorage = localStorage.getItem('@tarefa');
+  const [nutri, setNutri] = useState([]);
 
-  if(tarefasStorage) {
-    setTarefas(JSON.parse(tarefasStorage));
-  }
-}, []);
+  useEffect(() => { //Como está vazia, o useEffect vai ser chamado assim que a aplicação abrir
 
-useEffect(() => {
-  localStorage.setItem('@tarefa', JSON.stringify(tarefas));
-}, [tarefas]);
+    function loadApi() {
+      let url = 'https://sujeitoprogramador.com/rn-api/?api=posts';
+      fetch(url)
+      .then((resultado)=> resultado.json())//Transformando dados da API em JSON
+      .then((json)=> {//Chamando essa JSON
+        setNutri(json);//Mandando a json para dentro da setNutri
+      });
+    }
 
+    loadApi();//Assim que abrir a página, irá ser chamada essa function
 
-
-  function registrar(event) {
-    event.preventDefault();
-
-    setTarefas([...tarefas, input])
-    setInput('');
-  }
+  }, []);
 
   return(
-    <div>
-      <h1>Cadastrando usuário</h1>
-
-      <form onSubmit={registrar}>
-        <label>Nome da tarefa: </label><br/>
-        <input
-         placeholder='Digite uma tarefa'
-         value={input}
-         onChange={ (event) => setInput(event.target.value)}
-         /><br/>
-        <button type="submit">Registrar</button>
-      </form>
-
-      <br></br>
-
-      <ul>
-        {tarefas.map( tarefa=> (
-          <li key={tarefa}>{tarefa}</li>
-        ))}
-      </ul>
+    <div className="container">
+      <header>
+        <strong>React Nutri</strong>
+      </header>
+      {nutri.map((post)=> {//Percorrendo o useState por item
+        return(
+          <article key={post.id} className="post">
+            <strong className="title">{post.titulo}</strong>
+            <img src={post.capa} alt={post.titulo} className='photo'></img>
+            <p className='subtitle'>{post.subtitulo}</p>
+            <a className='button'>Acessar</a>
+          </article>
+        );
+      })}
     </div>
   );
 }
